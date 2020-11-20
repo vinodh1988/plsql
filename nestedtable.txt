@@ -1,0 +1,71 @@
+SQL> create type achievements is object(month varchar(15),year number(4),summary  varchar(100));
+  2  /
+
+Type created.
+
+SQL> create type achieved is table of achievements;
+  2  /
+
+Type created.
+
+sql>create table candidate
+  2  (
+  3  sno number(5) primary key,
+  4  name varchar(30) not null,
+  5  achieved_summary achieved
+  6  )
+  7* NESTED TABLE achieved_summary STORE AS a_summary
+  
+  /
+  table create;
+  
+  
+ SQL> insert into candidate values(1,'Rahul',achieved(achievements('January',2009,' Won 100 m race'),
+    achievements('Febraury',2012,' Won 200m race')));
+  row inserted
+  
+  SQL> insert into candidate values(2,'Jay',achieved(achievements('January',2011,' Played national game '),
+    achievements('Febraury',2014,'Won silver medal in shooting')));
+	row inserted
+	
+	
+	
+	
+	SQL> select * from candidate;
+
+       SNO NAME
+---------- ------------------------------
+ACHIEVED_SUMMARY(MONTH, YEAR, SUMMARY)
+--------------------------------------------------------------------------------
+         1 Rahul
+ACHIEVED(ACHIEVEMENTS('January', 2009, ' Won 100 m race'), ACHIEVEMENTS('Febraur
+y', 2012, ' Won 200m race'))
+
+         2 Jay
+ACHIEVED(ACHIEVEMENTS('January', 2011, ' Played national game '), ACHIEVEMENTS('
+Febraury', 2014, 'Won silver medal in shooting'))
+
+
+
+SQL> select c.sno,c.name,t.* from candidate c, table (c.achieved_summary) t ;
+
+       SNO NAME                           MONTH                 YEAR
+---------- ------------------------------ --------------- ----------
+SUMMARY
+--------------------------------------------------------------------------------
+         1 Rahul                          January               2009
+ Won 100 m race
+
+         1 Rahul                          Febraury              2012
+ Won 200m race
+
+         2 Jay                            January               2011
+ Played national game
+
+
+       SNO NAME                           MONTH                 YEAR
+---------- ------------------------------ --------------- ----------
+SUMMARY
+--------------------------------------------------------------------------------
+         2 Jay                            Febraury              2014
+Won silver medal in shooting
