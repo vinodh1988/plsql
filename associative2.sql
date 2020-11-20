@@ -1,0 +1,35 @@
+DECLARE
+   TYPE SALARYMAP IS TABLE OF EMPARRAY INDEX BY PLS_INTEGER;
+   V_SALARYMAP SALARYMAP;
+   V_EMPS EMPARRAY;
+   V_TEMP PLS_INTEGER;
+   X PLS_INTEGER:=2000;
+BEGIN
+   WHILE X < 25000
+      LOOP
+          V_EMPS:=EMPARRAY();
+          V_TEMP:=1;
+          FOR Y IN (SELECT * FROM EMPLOYEES WHERE SALARY BETWEEN X AND X+999)
+          LOOP
+            V_EMPS.EXTEND;
+            V_EMPS(V_TEMP):=Y.FIRST_NAME;
+            V_TEMP:=V_TEMP+1;
+          END LOOP;
+          V_SALARYMAP(X):=V_EMPS;
+        
+          X:=X+1000;
+     END LOOP;
+     
+     X:=2000;
+     WHILE X<25000
+     LOOP
+        IF V_SALARYMAP(X).COUNT > 0 THEN
+            INSERT INTO SALARYGROUP VALUES(X,V_SALARYMAP(X));
+        END IF; 
+        X:=X+1000;
+     END LOOP;
+     COMMIT;
+END;
+
+    
+   
